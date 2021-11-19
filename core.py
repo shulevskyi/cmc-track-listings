@@ -10,6 +10,7 @@ keep_alive.keep_alive()
 
 coinMaxIDCurrent, coinMaxIDPrevious = None, None
 
+# Telegram bot configuration
 bot_token = '2137631648:AAHuZe5ewqF1nHXmrBaQ7RImux48L_aYor0'
 bot_chatID = '1944256295'
 
@@ -29,7 +30,7 @@ while True:
         for i in data['data']['cryptoCurrencyMap']:
             coinAllID.append(i['id'])
 
-        # Finding the max id that occurred in CMC web api.
+        # Finding the max id that occurred in CMC web api. Simply, latest untracked listing
         coinMaxIDCurrent = max(coinAllID)
         print(coinMaxIDPrevious, coinMaxIDCurrent, str(datetime.now(timezone.utc))[0:19])  # Test output for console
 
@@ -37,7 +38,6 @@ while True:
             if coinMaxIDCurrent < coinMaxIDPrevious:
                 coinMaxIDCurrent = coinMaxIDPrevious
                 print('Token goes to active status, ID has been changed..')
-
 
         for i, k in enumerate(data['data']['cryptoCurrencyMap']):
             if k.get('platform') is not None:
