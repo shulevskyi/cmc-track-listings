@@ -10,7 +10,7 @@ find out that it grabs only one call for one request which is insane compared to
 Therefore, with a limit of 10000 calls per month, we could maintain a server for 3.5 days; however, the limit is not such a big problem;
 we will touch on this a bit later
   
-##### Endpoint /cryptocurrency/map
+#### Endpoint /cryptocurrency/map
 This endpoint provides us with every cryptocurrency on CMC, even if it’s not listed yet. Applying the -1 index to the dataset gives us the last token
 with listing status inactive, untracked or active. Currently, we building code on the untracked listing;
 
