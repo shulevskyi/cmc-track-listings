@@ -16,7 +16,7 @@ bot_chatID = '1944256295'
 
 while True:
 
-    url = 'https://api.coinmarketcap.com/data-api/v3/map/all?listing_status=active,untracked'
+    url = 'https://api.coinmarketcap.com/data-api/v3/map/all?listing_status=active'
     session = Session()
 
     try:
