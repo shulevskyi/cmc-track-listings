@@ -1,65 +1,72 @@
-import time
-import telebot
+import keep_alive
 from requests import Request, Session
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
-from datetime import datetime, timedelta, timezone
 import json
+from datetime import datetime, timedelta, timezone
+import time
+import requests
 
-url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/map'
-parameters = {
-    'start': '1'
-}
+keep_alive.keep_alive()
 
-headers = {
-    'Accepts': 'application/json',
-    'X-CMC_PRO_API_KEY': '',
-}
+coinMaxIDCurrent, coinMaxIDPrevious = None, None
 
-coinIDCurrent, coinIDPrevious = None, None
+bot_token = '2137631648:AAHuZe5ewqF1nHXmrBaQ7RImux48L_aYor0'
+bot_chatID = '1944256295'
 
 while True:
 
+    url = 'https://api.coinmarketcap.com/data-api/v3/map/all?listing_status=active,untracked'
     session = Session()
-    session.headers.update(headers)
 
     try:
-        coinIDPrevious = coinIDCurrent
 
-        response = session.get(url, params=parameters)
+        coinMaxIDPrevious = coinMaxIDCurrent
+        coinAllID = []
+
+        response = session.get(url)
         data = json.loads(response.text)
 
-        coinIDCurrent = data['data'][-1]['id']
+        for i in data['data']['cryptoCurrencyMap']:
+            coinAllID.append(i['id'])
 
-        print(coinIDPrevious, coinIDCurrent)
+        # Finding the max id that occurred in CMC web api.
+        coinMaxIDCurrent = max(coinAllID)
+        print(coinMaxIDPrevious, coinMaxIDCurrent, str(datetime.now(timezone.utc))[0:19])  # Test output for console
 
-        if coinIDPrevious is not None and coinIDCurrent > coinIDPrevious:
-            if data['data'][-1]['platform'] is not None:
-                if data['data'][-1]['platform']['symbol'] == 'BNB':
+        if coinMaxIDPrevious is not None:
+            if coinMaxIDCurrent < coinMaxIDPrevious:
+                coinMaxIDCurrent = coinMaxIDPrevious
+                print('Token goes to active status, ID has been changed..')
 
-                    coinSymbolTelegram = data['data'][-1]['symbol']
-                    coinStatusTelegram = data['data'][-1]['is_active']
-                    coinPlatformTelegram = data['data'][-1]['platform']['name']
-                    coinAddressTelegram = data['data'][-1]['platform']['token_address'].lower()
-                    BaseUrl = f'https://matcha.xyz/markets/56/{coinAddressTelegram}'
 
-                    bot_message = \
-                        f'\U0001F7E1 New listing [{coinSymbolTelegram}] from CMC pro-database: \n \n' \
-                        f'Token symbol: {coinSymbolTelegram} \n' \
-                        f'Status: {coinStatusTelegram} \n' \
-                        f'Address: {coinAddressTelegram} \n' \
-                        f'Platform: {coinPlatformTelegram} \n' \
-                        f'Time UTC: {str(datetime.now(timezone.utc))[0:19]} \n \n' \
-                        f'Trade link: {BaseUrl}'
+        for i, k in enumerate(data['data']['cryptoCurrencyMap']):
+            if k.get('platform') is not None:
+                if k['id'] == coinMaxIDCurrent and coinMaxIDPrevious is not None:
 
-                    print('Sending to TG...')
+                    if coinMaxIDCurrent > coinMaxIDPrevious:
+                        coinSymbolTelegram = k['symbol']
+                        coinStatusTelegram = k['status']
+                        coinPlatformTelegram = k['platform']['name']
+                        coinAddressTelegram = k['platform']['token_address'].lower()
+                        # BaseUrl = f'https://matcha.xyz/markets/56/{coinAddressTelegram}'
 
-                    bot = telebot.TeleBot('2137631648:AAHuZe5ewqF1nHXmrBaQ7RImux48L_aYor0')
-                    user_id = [1944256295]
+                        bot_message = \
+                            f'\U0001F7E1 New listing [{coinSymbolTelegram}] from CMC web-database v3 (Untracked): \n \n' \
+                            f'Token symbol: {coinSymbolTelegram} \n' \
+                            f'Status: {coinStatusTelegram} \n' \
+                            f'Address: {coinAddressTelegram} \n' \
+                            f'Platform: {coinPlatformTelegram} \n' \
+                            f'Time UTC: {str(datetime.now(timezone.utc))[0:19]} \n \n' \
+                            # f'Trade link: {BaseUrl}'
 
-                    for chat in user_id:
-                        bot.send_message(chat_id=chat, text=bot_message)
+                        print('Sending to TG...')
+                        print(coinSymbolTelegram)
 
-        time.sleep(30)
+                        send_text = 'https://api.telegram.org/bot' + bot_token + '/sendMessage?chat_id=' + bot_chatID + '&parse_mode=Markdown&text=' + bot_message
+                        response = requests.get(send_text)
+
+        # CMC does not require api key for any operation on its web-api, thus, we may set any time here.
+        time.sleep(5)
 
     except (ConnectionError, Timeout, TooManyRedirects) as e:
         print(e)
