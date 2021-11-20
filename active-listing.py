@@ -51,7 +51,7 @@ while True:
                         # BaseUrl = f'https://matcha.xyz/markets/56/{coinAddressTelegram}'
 
                         bot_message = \
-                            f'\U0001F7E1 New listing [{coinSymbolTelegram}] from CMC web-database v3 (Active): \n \n' \
+                            f'\U0001F7E2 New listing [{coinSymbolTelegram}] from CMC web-database v3 (Active): \n \n' \
                             f'Token symbol: {coinSymbolTelegram} \n' \
                             f'Status: {coinStatusTelegram} \n' \
                             f'Address: {coinAddressTelegram} \n' \
