@@ -40,30 +40,31 @@ while True:
 
 
         for i, k in enumerate(data['data']['cryptoCurrencyMap']):
-            if k.get('platform') is not None:
-                if k['id'] == coinMaxIDCurrent and coinMaxIDPrevious is not None:
+            if k['id'] == coinMaxIDCurrent and coinMaxIDPrevious is not None:
 
-                    if coinMaxIDCurrent > coinMaxIDPrevious:
-                        coinSymbolTelegram = k['symbol']
-                        coinStatusTelegram = k['status']
-                        coinPlatformTelegram = k['platform']['name']
-                        coinAddressTelegram = k['platform']['token_address'].lower()
-                        # BaseUrl = f'https://matcha.xyz/markets/56/{coinAddressTelegram}'
+                if coinMaxIDCurrent > coinMaxIDPrevious:
+                    coinSymbolTelegram = k['symbol']
+                    coinStatusTelegram = k['status']
+                    
+                    # New tokens that appear in untracked listing doe not have a platform and address as well. Fix this
+                    coinPlatformTelegram = 'NO DATA?'
+                    coinAddressTelegram = 'NO DATA?'
+                    # BaseUrl = f'https://matcha.xyz/markets/56/{coinAddressTelegram}'
 
-                        bot_message = \
-                            f'\U0001F534 Token [{coinSymbolTelegram}] appeared in CMC web-database v3 (Untracked): \n \n' \
-                            f'Token symbol: {coinSymbolTelegram} \n' \
-                            f'Status: {coinStatusTelegram} \n' \
-                            f'Address: {coinAddressTelegram} \n' \
-                            f'Platform: {coinPlatformTelegram} \n' \
-                            f'Time UTC: {str(datetime.now(timezone.utc))[0:19]} \n \n' \
-                            # f'Trade link: {BaseUrl}'
+                    bot_message = \
+                        f'\U0001F7E0 Token [{coinSymbolTelegram}] appeared in CMC web-database v3 (Untracked): \n \n' \
+                        f'Token symbol: {coinSymbolTelegram} \n' \
+                        f'Status: {coinStatusTelegram} \n' \
+                        f'Address: {coinAddressTelegram} \n' \
+                        f'Platform: {coinPlatformTelegram} \n' \
+                        f'Time UTC: {str(datetime.now(timezone.utc))[0:19]} \n \n' \
+                        # f'Trade link: {BaseUrl}'
 
-                        print('Sending to TG...')
-                        print(coinSymbolTelegram)
+                    print('Sending to TG...')
+                    print(coinSymbolTelegram)
 
-                        send_text = 'https://api.telegram.org/bot' + bot_token + '/sendMessage?chat_id=' + bot_chatID + '&parse_mode=Markdown&text=' + bot_message
-                        response = requests.get(send_text)
+                    send_text = 'https://api.telegram.org/bot' + bot_token + '/sendMessage?chat_id=' + bot_chatID + '&parse_mode=Markdown&text=' + bot_message
+                    response = requests.get(send_text)
 
         # CMC does not require api key for any operation on its web-api, thus, we may set any time here.
         time.sleep(5)
