@@ -1,10 +1,11 @@
 import keep_alive
+import telebot
+from telebot import types
 from requests import Request, Session
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 import json
 from datetime import datetime, timedelta, timezone
 import time
-import requests
 
 keep_alive.keep_alive()
 
@@ -26,46 +27,50 @@ while True:
         response = session.get(url)
         data = json.loads(response.text)
 
-        for i in data['data']['cryptoCurrencyMap']:
-            coinAllID.append(i['id'])
+        if coinMaxIDCurrent is not None:
+            for i in data['data']['cryptoCurrencyMap']:
+                if i['id'] > coinMaxIDCurrent:
+                    coinMaxIDCurrent = i['id']
 
-        # Finding the max id that occurred in CMC web api.
-        coinMaxIDCurrent = max(coinAllID)
+        if coinMaxIDCurrent is None:
+            for i in data['data']['cryptoCurrencyMap']:
+                coinAllID.append(i['id'])
+            coinMaxIDCurrent = max(coinAllID)
+
         print(coinMaxIDPrevious, coinMaxIDCurrent, str(datetime.now(timezone.utc))[0:19])  # Test output for console
 
-        if coinMaxIDPrevious is not None:
-            if coinMaxIDCurrent < coinMaxIDPrevious:
-                coinMaxIDPrevious = coinMaxIDCurrent
-                print('Due to an error ID has been changed..')
-
-
         for i, k in enumerate(data['data']['cryptoCurrencyMap']):
-            if k.get('platform') is not None:
-                if k['id'] == coinMaxIDCurrent and coinMaxIDPrevious is not None:
+            if k['id'] == coinMaxIDCurrent and coinMaxIDPrevious is not None:
+                if k.get('platform') is not None:
 
                     if coinMaxIDCurrent > coinMaxIDPrevious:
                         coinSymbolTelegram = k['symbol']
                         coinStatusTelegram = k['status']
                         coinPlatformTelegram = k['platform']['name']
                         coinAddressTelegram = k['platform']['token_address'].lower()
-                        # BaseUrl = f'https://matcha.xyz/markets/56/{coinAddressTelegram}'
+                        coinSlug = k['slug']
 
                         bot_message = \
-                            f'\U0001F7E2 New listing [{coinSymbolTelegram}] from CMC web-database v3 (Active): \n \n' \
+                            f'\U0001F7E2 Token [{coinSymbolTelegram}] appeared in CMC web-database v3 (Active): \n \n' \
                             f'Token symbol: {coinSymbolTelegram} \n' \
                             f'Status: {coinStatusTelegram} \n' \
                             f'Address: {coinAddressTelegram} \n' \
-                            f'Platform: {coinPlatformTelegram} \n' \
+                            f'Platform: {coinPlatformTelegram} \n \n' \
                             f'Time UTC: {str(datetime.now(timezone.utc))[0:19]} \n \n' \
-                            # f'Trade link: {BaseUrl}'
 
-                        print('Sending to TG...')
-                        print(coinSymbolTelegram)
+                        print('Sending to TG...', coinSymbolTelegram)
 
-                        send_text = 'https://api.telegram.org/bot' + bot_token + '/sendMessage?chat_id=' + bot_chatID + '&parse_mode=Markdown&text=' + bot_message
-                        response = requests.get(send_text)
+                        coinInfoUrl = f'https://coinmarketcap.com/currencies/{coinSlug}'
+                        coinExchangeUrl = f'https://poocoin.app/tokens/{coinAddressTelegram}'
+                        bot = telebot.TeleBot(token=bot_token)
 
-        # CMC does not require api key for any operation on its web-api, thus, we may set any time here.
+                        markup_inline = types.InlineKeyboardMarkup()
+                        coinInfo = types.InlineKeyboardButton(text='COINMARKETCAP', url=coinInfoUrl)
+                        coinExchange = types.InlineKeyboardButton(text='POOCOIN', url=coinExchangeUrl)
+
+                        markup_inline.add(coinInfo, coinExchange)
+                        bot.send_message(1944256295, bot_message, reply_markup=markup_inline)
+
         time.sleep(5)
 
     except (ConnectionError, Timeout, TooManyRedirects) as e:
