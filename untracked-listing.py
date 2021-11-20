@@ -35,7 +35,7 @@ while True:
 
         if coinMaxIDPrevious is not None:
             if coinMaxIDCurrent < coinMaxIDPrevious:
-                coinMaxIDCurrent = coinMaxIDPrevious
+                coinMaxIDPrevious = coinMaxIDCurrent
                 print('Token goes to active status, ID has been changed..')
 
 
