@@ -1,4 +1,3 @@
-from keep_alive import keep_alive
 import os
 import telebot
 from telebot import types
@@ -7,8 +6,6 @@ from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 import json
 from datetime import datetime, timedelta, timezone
 import time
-
-keep_alive()
 
 coinMaxIDCurrent, coinMaxIDPrevious = None, None
 
