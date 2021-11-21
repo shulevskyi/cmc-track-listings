@@ -1,4 +1,5 @@
-import keep_alive
+from keep_alive import keep_alive
+import os
 import telebot
 from telebot import types
 from requests import Request, Session
@@ -7,8 +8,7 @@ import json
 from datetime import datetime, timedelta, timezone
 import time
 
-keep_alive.keep_alive()
-
+keep_alive()
 coinMaxIDCurrent, coinMaxIDPrevious = None, None
 
 bot_token = '2137631648:AAHuZe5ewqF1nHXmrBaQ7RImux48L_aYor0'
@@ -50,7 +50,7 @@ while True:
                     coinAddressTelegram = 'NO DATA?'
 
                     bot_message = \
-                        f'\U0001F7E0 Token [{coinSymbolTelegram}] appeared in CMC web-database v3 (Untracked): \n \n' \
+                        f'\U0001F534 Token [{coinSymbolTelegram}] appeared in CMC web-database v3 (Untracked): \n \n' \
                         f'Token symbol: {coinSymbolTelegram} \n' \
                         f'Status: {coinStatusTelegram} \n' \
                         f'Address: {coinAddressTelegram} \n' \
