@@ -1,4 +1,3 @@
-from keep_alive import keep_alive
 import os
 import telebot
 from telebot import types
@@ -8,7 +7,6 @@ import json
 from datetime import datetime, timedelta, timezone
 import time
 
-keep_alive()
 coinMaxIDCurrent, coinMaxIDPrevious = None, None
 
 bot_token = '2137631648:AAHuZe5ewqF1nHXmrBaQ7RImux48L_aYor0'
