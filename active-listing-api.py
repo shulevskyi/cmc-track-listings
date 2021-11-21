@@ -1,4 +1,5 @@
-import keep_alive
+from keep_alive import keep_alive
+import os
 import telebot
 from telebot import types
 from requests import Request, Session
@@ -7,7 +8,7 @@ import json
 from datetime import datetime, timedelta, timezone
 import time
 
-keep_alive.keep_alive()
+keep_alive()
 
 coinMaxIDCurrent, coinMaxIDPrevious = None, None
 
@@ -51,7 +52,7 @@ while True:
                         coinSlug = k['slug']
 
                         bot_message = \
-                            f'\U0001F7E2 Token [{coinSymbolTelegram}] appeared in CMC web-database v3 (Active): \n \n' \
+                            f'\U0001F7E0 Token [{coinSymbolTelegram}] appeared in CMC web-database v3 (Active): \n \n' \
                             f'Token symbol: {coinSymbolTelegram} \n' \
                             f'Status: {coinStatusTelegram} \n' \
                             f'Address: {coinAddressTelegram} \n' \
