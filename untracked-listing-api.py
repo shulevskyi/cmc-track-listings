@@ -1,3 +1,5 @@
+# Unused
+
 import os
 import telebot
 from telebot import types
