@@ -9,7 +9,7 @@ import time
 coinMaxIDCurrent, coinMaxIDPrevious = None, None
 
 bot_token = '2115705864:AAFELUiqkPjO9Ndpod9CkVqJgiwYldMytUQ'
-bot_chatID = [2143580591]
+bot_chatID = 2143580591
 
 while True:
 
@@ -64,7 +64,6 @@ while True:
                     coinExchange = types.InlineKeyboardButton(text='POOCOIN', url=coinExchangeUrl)
 
                     markup_inline.add(coinInfo, coinExchange)
-                    for user in bot_chatID:
-                        bot.send_message(user, bot_message, reply_markup=markup_inline)
+                    bot.send_message(bot_chatID, bot_message, reply_markup=markup_inline)
 
     time.sleep(5)
