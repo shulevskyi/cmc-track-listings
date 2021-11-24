@@ -8,7 +8,7 @@ import time
 
 coinMaxIDCurrent, coinMaxIDPrevious = None, None
 
-bot_token = '2137631648:AAHuZe5ewqF1nHXmrBaQ7RImux48L_aYor0'
+bot_token = '2115705864:AAFELUiqkPjO9Ndpod9CkVqJgiwYldMytUQ'
 bot_chatID = ['2143580591', '941016072', '485492322']
 
 while True:
