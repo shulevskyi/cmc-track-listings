@@ -9,7 +9,7 @@ import requests
 coinMaxIDCurrent, coinMaxIDPrevious = None, None
 
 bot_token = '2137631648:AAHuZe5ewqF1nHXmrBaQ7RImux48L_aYor0'
-bot_chatID = ['1944256295', '941016072', '485492322']
+bot_chatID = ['2143580591', '941016072', '485492322']
 
 while True:
 
