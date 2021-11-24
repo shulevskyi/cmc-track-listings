@@ -9,7 +9,7 @@ import requests
 coinMaxIDCurrent, coinMaxIDPrevious = None, None
 
 bot_token = '2137631648:AAHuZe5ewqF1nHXmrBaQ7RImux48L_aYor0'
-bot_chatID = 2143580591
+bot_chatID = ['1944256295', '941016072', '485492322']
 
 while True:
 
@@ -18,52 +18,57 @@ while True:
         ('limit', '10000'),
         ('convert', 'USD')
     ]
-
     base = "https://api.coinmarketcap.com/data-api/v3/cryptocurrency/listing?"
     data = requests.get(f"{base}{urlencode(query_string)}").json()
 
-    coinMaxIDPrevious = coinMaxIDCurrent
-    coinAllID = []
+    try:
 
-    for i in data["data"]["cryptoCurrencyList"]:
-        pass
+        coinMaxIDPrevious = coinMaxIDCurrent
+        coinAllID = []
 
-    if coinMaxIDCurrent is not None:
         for i in data["data"]["cryptoCurrencyList"]:
-            if i['id'] > coinMaxIDCurrent:
-                coinMaxIDCurrent = i['id']
+            pass
 
-    if coinMaxIDCurrent is None:
-        for i in data["data"]["cryptoCurrencyList"]:
-            coinAllID.append(i['id'])
-        coinMaxIDCurrent = max(coinAllID)
+        if coinMaxIDCurrent is not None:
+            for i in data["data"]["cryptoCurrencyList"]:
+                if i['id'] > coinMaxIDCurrent:
+                    coinMaxIDCurrent = i['id']
 
-    print(coinMaxIDPrevious, coinMaxIDCurrent, str(datetime.now(timezone.utc))[0:19])  # Test output for console
+        if coinMaxIDCurrent is None:
+            for i in data["data"]["cryptoCurrencyList"]:
+                coinAllID.append(i['id'])
+            coinMaxIDCurrent = max(coinAllID)
 
-    for i, k in enumerate(data['data']['cryptoCurrencyList']):
-        if k['id'] == coinMaxIDCurrent and coinMaxIDPrevious is not None:
+        print(coinMaxIDPrevious, coinMaxIDCurrent, str(datetime.now(timezone.utc))[0:19])  # Test output for console
 
-            if coinMaxIDCurrent > coinMaxIDPrevious:
-                coinSymbolTelegram = k['symbol']
-                coinStatusTelegram = 'Active'
-                coinSlug = k['slug']
+        for i, k in enumerate(data['data']['cryptoCurrencyList']):
+            if k['id'] == coinMaxIDCurrent and coinMaxIDPrevious is not None:
 
-                bot_message = \
-                    f'\U0001F7E2 Token [{coinSymbolTelegram}] added to "Recently added" section on CMC: \n \n' \
-                    f'Token symbol: {coinSymbolTelegram} \n' \
-                    f'Status: {coinStatusTelegram} \n' \
-                    f'Time UTC: {str(datetime.now(timezone.utc))[0:19]} \n \n' \
+                if coinMaxIDCurrent > coinMaxIDPrevious:
+                    coinSymbolTelegram = k['symbol']
+                    coinStatusTelegram = 'Active'
+                    coinSlug = k['slug']
 
-                print('Sending to TG...', coinSymbolTelegram)
+                    bot_message = \
+                        f'\U0001F7E2 Token [{coinSymbolTelegram}] added to "Recently added" section on CMC: \n \n' \
+                        f'Token symbol: {coinSymbolTelegram} \n' \
+                        f'Status: {coinStatusTelegram} \n' \
+                        f'Time UTC: {str(datetime.now(timezone.utc))[0:19]} \n \n' \
 
-                coinInfoUrl = f'https://coinmarketcap.com/currencies/{coinSlug}'
-                bot = telebot.TeleBot(token=bot_token)
+                    print('Sending to TG...', coinSymbolTelegram)
 
-                markup_inline = types.InlineKeyboardMarkup()
-                coinInfo = types.InlineKeyboardButton(text='COINMARKETCAP', url=coinInfoUrl)
+                    coinInfoUrl = f'https://coinmarketcap.com/currencies/{coinSlug}'
+                    bot = telebot.TeleBot(token=bot_token)
 
-                markup_inline.add(coinInfo)
-                bot.send_message(bot_chatID, bot_message, reply_markup=markup_inline)
+                    markup_inline = types.InlineKeyboardMarkup()
+                    coinInfo = types.InlineKeyboardButton(text='COINMARKETCAP', url=coinInfoUrl)
 
+                    markup_inline.add(coinInfo)
+                    
+                    for users in bot_chatID:
+                        bot.send_message(users, bot_message, reply_markup=markup_inline)
 
-    time.sleep(5)
+        time.sleep(5)
+
+    except (ConnectionError, Timeout, TooManyRedirects) as e:
+        print(e)
