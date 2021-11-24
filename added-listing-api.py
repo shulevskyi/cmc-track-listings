@@ -63,6 +63,7 @@ while True:
                 coinInfo = types.InlineKeyboardButton(text='COINMARKETCAP', url=coinInfoUrl)
 
                 markup_inline.add(coinInfo)
-                bot.send_message(user, bot_chatID, reply_markup=markup_inline)
+                bot.send_message(bot_chatID, bot_message, reply_markup=markup_inline)
+
 
     time.sleep(5)
