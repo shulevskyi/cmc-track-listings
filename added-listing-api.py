@@ -9,7 +9,7 @@ import requests
 coinMaxIDCurrent, coinMaxIDPrevious = None, None
 
 bot_token = '2137631648:AAHuZe5ewqF1nHXmrBaQ7RImux48L_aYor0'
-bot_chatID = [2143580591]
+bot_chatID = 2143580591
 
 while True:
 
@@ -63,7 +63,6 @@ while True:
                 coinInfo = types.InlineKeyboardButton(text='COINMARKETCAP', url=coinInfoUrl)
 
                 markup_inline.add(coinInfo)
-                for user in bot_chatID:
-                    bot.send_message(user, bot_message, reply_markup=markup_inline)
+                bot.send_message(user, bot_chatID, reply_markup=markup_inline)
 
     time.sleep(5)
