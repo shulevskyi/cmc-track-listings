@@ -8,62 +8,67 @@ import time
 
 coinMaxIDCurrent, coinMaxIDPrevious = None, None
 
-bot_token = '2115705864:AAFELUiqkPjO9Ndpod9CkVqJgiwYldMytUQ'
-bot_chatID = 2143580591
+bot_token = '2137631648:AAHuZe5ewqF1nHXmrBaQ7RImux48L_aYor0'
+bot_chatID = ['1944256295', '941016072']
 
 while True:
 
     url = 'https://api.coinmarketcap.com/data-api/v3/map/all?listing_status=active'
     session = Session()
 
-    coinMaxIDPrevious = coinMaxIDCurrent
-    coinAllID = []
+    try:
 
-    response = session.get(url)
-    data = json.loads(response.text)
+        coinMaxIDPrevious = coinMaxIDCurrent
+        coinAllID = []
 
-    if coinMaxIDCurrent is not None:
-        for i in data['data']['cryptoCurrencyMap']:
-            if i['id'] > coinMaxIDCurrent:
-                coinMaxIDCurrent = i['id']
+        response = session.get(url)
+        data = json.loads(response.text)
 
-    if coinMaxIDCurrent is None:
-        for i in data['data']['cryptoCurrencyMap']:
-            coinAllID.append(i['id'])
-        coinMaxIDCurrent = max(coinAllID)
+        if coinMaxIDCurrent is not None:
+            for i in data['data']['cryptoCurrencyMap']:
+                if i['id'] > coinMaxIDCurrent:
+                    coinMaxIDCurrent = i['id']
 
-    print(coinMaxIDPrevious, coinMaxIDCurrent, str(datetime.now(timezone.utc))[0:19])  # Test output for console
+        if coinMaxIDCurrent is None:
+            for i in data['data']['cryptoCurrencyMap']:
+                coinAllID.append(i['id'])
+            coinMaxIDCurrent = max(coinAllID)
 
-    for i, k in enumerate(data['data']['cryptoCurrencyMap']):
-        if k['id'] == coinMaxIDCurrent and coinMaxIDPrevious is not None:
-            if k.get('platform') is not None:
+        print(coinMaxIDPrevious, coinMaxIDCurrent, str(datetime.now(timezone.utc))[0:19])  # Test output for console
 
-                if coinMaxIDCurrent > coinMaxIDPrevious:
-                    coinSymbolTelegram = k['symbol']
-                    coinStatusTelegram = k['status']
-                    coinPlatformTelegram = k['platform']['name']
-                    coinAddressTelegram = k['platform']['token_address'].lower()
-                    coinSlug = k['slug']
+        for i, k in enumerate(data['data']['cryptoCurrencyMap']):
+            if k['id'] == coinMaxIDCurrent and coinMaxIDPrevious is not None:
+                if k.get('platform') is not None:
 
-                    bot_message = \
-                        f'\U0001F7E0 Token [{coinSymbolTelegram}] appeared in CMC web-database v3 (Active): \n \n' \
-                        f'Token symbol: {coinSymbolTelegram} \n' \
-                        f'Status: {coinStatusTelegram} \n' \
-                        f'Address: {coinAddressTelegram} \n' \
-                        f'Platform: {coinPlatformTelegram} \n \n' \
-                        f'Time UTC: {str(datetime.now(timezone.utc))[0:19]} \n \n' \
+                    if coinMaxIDCurrent > coinMaxIDPrevious:
+                        coinSymbolTelegram = k['symbol']
+                        coinStatusTelegram = k['status']
+                        coinPlatformTelegram = k['platform']['name']
+                        coinAddressTelegram = k['platform']['token_address'].lower()
+                        coinSlug = k['slug']
 
-                    print('Sending to TG...', coinSymbolTelegram)
+                        bot_message = \
+                            f'\U0001F7E0 Token [{coinSymbolTelegram}] appeared in CMC web-database v3 (Active): \n \n' \
+                            f'Token symbol: {coinSymbolTelegram} \n' \
+                            f'Status: {coinStatusTelegram} \n' \
+                            f'Address: {coinAddressTelegram} \n' \
+                            f'Platform: {coinPlatformTelegram} \n \n' \
+                            f'Time UTC: {str(datetime.now(timezone.utc))[0:19]} \n \n' \
 
-                    coinInfoUrl = f'https://coinmarketcap.com/currencies/{coinSlug}'
-                    coinExchangeUrl = f'https://poocoin.app/tokens/{coinAddressTelegram}'
-                    bot = telebot.TeleBot(token=bot_token)
+                        print('Sending to TG...', coinSymbolTelegram)
 
-                    markup_inline = types.InlineKeyboardMarkup()
-                    coinInfo = types.InlineKeyboardButton(text='COINMARKETCAP', url=coinInfoUrl)
-                    coinExchange = types.InlineKeyboardButton(text='POOCOIN', url=coinExchangeUrl)
+                        coinInfoUrl = f'https://coinmarketcap.com/currencies/{coinSlug}'
+                        coinExchangeUrl = f'https://poocoin.app/tokens/{coinAddressTelegram}'
+                        bot = telebot.TeleBot(token=bot_token)
 
-                    markup_inline.add(coinInfo, coinExchange)
-                    bot.send_message(bot_chatID, bot_message, reply_markup=markup_inline)
+                        markup_inline = types.InlineKeyboardMarkup()
+                        coinInfo = types.InlineKeyboardButton(text='COINMARKETCAP', url=coinInfoUrl)
+                        coinExchange = types.InlineKeyboardButton(text='POOCOIN', url=coinExchangeUrl)
 
-    time.sleep(5)
+                        markup_inline.add(coinInfo, coinExchange)
+                        bot.send_message(1944256295, bot_message, reply_markup=markup_inline)
+
+        time.sleep(5)
+
+    except (ConnectionError, Timeout, TooManyRedirects) as e:
+        print(e)
